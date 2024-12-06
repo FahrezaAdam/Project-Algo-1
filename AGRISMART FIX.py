@@ -173,7 +173,7 @@ def lihat_data_pengguna():
         data_pengguna = pd.read_csv('data.csv')
         
         # Menampilkan data pengguna dalam format tabel
-        print(tabulate(data_pengguna, headers='keys', tablefmt='psql', showindex=False))
+        print(center(tabulate(data_pengguna, headers='keys', tablefmt='psql', showindex=False)))
     except FileNotFoundError:
         print("File tidak ditemukan. Pastikan path file CSV sudah benar.")
     except Exception as e:
@@ -254,7 +254,7 @@ def rekap_pemesanan():
         data_pemesanan['status'] = data_pemesanan['status'].fillna('Belum Dibayar') 
 
         # Tampilkan tabel tanpa kolom 'tanggal_pembayaran'
-        print(tabulate(data_pemesanan[required_columns], headers='keys', tablefmt='psql', showindex=False)) 
+        print(center(tabulate(data_pemesanan[required_columns], headers='keys', tablefmt='psql', showindex=False)))
 
     except FileNotFoundError: 
         print("File tidak ditemukan.") 
@@ -606,7 +606,7 @@ def kelola_transaksi():
         pemesanan_user['harga'] = pemesanan_user['harga'].apply(lambda x: f"Rp {x:,.0f}") 
 
         # Menampilkan tabel dengan tabulate, mengatur lebar kolom jika diperlukan 
-        print(tabulate(pemesanan_user, headers='keys', tablefmt='psql', showindex=False, numalign="right")) 
+        print(center(tabulate(pemesanan_user, headers='keys', tablefmt='psql', showindex=False, numalign="right"))) 
 
         # Cek apakah ada pesanan yang belum dibayar 
         if 'Belum Dibayar' in pemesanan_user['status'].values: 
