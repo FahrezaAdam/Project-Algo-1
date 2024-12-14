@@ -98,10 +98,9 @@ def tampilkan_peraturan():
     print(peraturan)
     skip()
 
-# Variabel untuk menyimpan status login dan peran pengguna
 is_logged_in = False
-role = None  # Menyimpan apakah pengguna adalah 'admin' atau 'user'
-username = None  # Menyimpan username untuk digunakan di fungsi lain
+role = None  
+username = None  
 
 def login():  # membuat fungsi login
     global is_logged_in, role, username  # gunakan variabel global untuk peran pengguna dan username
@@ -122,15 +121,15 @@ def login():  # membuat fungsi login
     
     # Membaca file CSV untuk login pengguna biasa
     try:
-        with open("data.csv", "r") as file:  # membuka file data.csv
+        with open("data.csv", "r") as file:  
             reader = csv.reader(file)
             next(reader)  # melewati header username,password
             for x in reader:
                 if x[0] == username_input and x[1] == password:  # verifikasi username dan password
                     print(center("Login berhasil"))
-                    is_logged_in = True  # login berhasil
-                    role = "user"  # set peran sebagai user
-                    username = username_input  # simpan username
+                    is_logged_in = True  
+                    role = "user"  
+                    username = username_input  
                     return
     except Exception as e:
         print(center(f"Terjadi kesalahan saat membaca file: {e}"))
@@ -149,7 +148,7 @@ def register():  # membuat fungsi register
     if not os.path.exists("data.csv"):  # cek jika data.csv belum ada membuat file baru dengan header
         with open("data.csv", "w", newline="") as file:
             write = csv.writer(file)
-            write.writerow(["username", "password"])  # sebagai header
+            write.writerow(["username", "password"]) 
     
     try:
         with open("data.csv", "r") as file:
@@ -196,15 +195,15 @@ def hapus_pengguna():
     username_input = input("Masukkan username pengguna yang ingin dihapus: ").strip()
     
     if username_input in daftar_pengguna:  # Cek apakah username ada di daftar
-        daftar_pengguna.remove(username_input)  # Hapus username dari daftar
+        daftar_pengguna.remove(username_input)  
         print(center(f"Pengguna '{username_input}' telah dihapus."))
         
         # Simpan perubahan ke file data.csv
         with open("data.csv", "w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["username", "password"])  # Tulis header
+            writer.writerow(["username", "password"])  
             for user in daftar_pengguna:
-                writer.writerow([user, ""])  # Tulis username, password bisa dikosongkan atau diisi sesuai kebutuhan
+                writer.writerow([user, ""])  
     else:
         print(center(f"Pengguna '{username_input}' tidak ditemukan."))
 
@@ -213,21 +212,20 @@ load_pengguna()
 def catat_pemesanan(username, tipe_pesanan, jumlah, status="Belum Dibayar", total_harga=None):
     try:
         # Cek apakah file rekap_pemesanan.csv sudah ada 
-        if not os.path.exists("rekap_pemesanan.csv"):
-            # Jika file belum ada, buat file baru dan tulis header 
+        if not os.path.exists("rekap_pemesanan.csv"): 
             with open("rekap_pemesanan.csv", "w", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow(["username", "tipe_pesanan", "jumlah", "status", "harga", "tanggal_pemesanan", "tanggal_pembayaran"])  # Tambahkan kolom tanggal_pemesanan
+                writer.writerow(["username", "tipe_pesanan", "jumlah", "status", "harga", "tanggal_pemesanan", "tanggal_pembayaran"])  
 
         # Tambahkan pemesanan ke file rekap_pemesanan.csv 
         with open("rekap_pemesanan.csv", "a", newline="") as file:
             writer = csv.writer(file)
-            tanggal_pemesanan = datetime.now().strftime('%Y-%m-%d')  # Ambil tanggal saat ini
+            tanggal_pemesanan = datetime.now().strftime('%Y-%m-%d')  
             if status == "Lunas":
-                tanggal_pembayaran = datetime.now().strftime('%Y-%m-%d')  # Ambil tanggal saat ini 
+                tanggal_pembayaran = datetime.now().strftime('%Y-%m-%d') 
             else:
-                tanggal_pembayaran = ""  # Kosongkan jika belum lunas
-            writer.writerow([username, tipe_pesanan, jumlah, status, total_harga, tanggal_pemesanan, tanggal_pembayaran])  # Simpan tanggal_pemesanan
+                tanggal_pembayaran = "" 
+            writer.writerow([username, tipe_pesanan, jumlah, status, total_harga, tanggal_pemesanan, tanggal_pembayaran]) 
 
     except Exception as e:
         print(f"Terjadi kesalahan saat mencatat pemesanan: {e}")
@@ -265,6 +263,175 @@ def rekap_pemesanan():
     except Exception as e: 
         print(f"Terjadi kesalahan: {e}") 
 
+def tambah_tanaman():
+    # Memeriksa apakah pengguna adalah admin
+    if role != "admin":
+        print(center("Hanya admin yang dapat menambahkan tanaman."))
+        return
+    
+    # Meminta input dari admin untuk menambahkan tanaman baru
+    print(center("===================== Tambah Tanaman ====================="))
+    nama_tanaman = input("Masukkan nama tanaman: ").strip()
+    try:
+        with open('data_tanaman.csv', 'r') as file:
+            reader = csv.reader(file)
+            next(reader)
+            for x in reader:
+                if x[0] == nama_tanaman:
+                    print(center("Tanaman sudah ada"))
+                    return
+    except Exception as e:
+        print(center(f"Terjadi kesalahan {e} silahkan coba kembali"))
+        
+    harga_per_kg = input("Masukkan harga bibit per kg: ").strip()
+    kebutuhan_bibit = input("Masukkan kebutuhan bibit per hektar (kg): ").strip()
+    suhu = input("Masukkan rentang suhu optimal (contoh: 24°C - 30°C): ").strip()
+    ketersediaan_air = input("Masukkan kebutuhan air (contoh: 1000-2000 mm): ").strip()
+    ph_tanah = input("Masukkan pH tanah optimal: ").strip()
+    ketersediaan_nutrisi = input("Masukkan kebutuhan nutrisi (contoh: Nitrogen, fosfor, kalium): ").strip()
+    tekstur_tanah = input("Masukkan tekstur tanah yang cocok: ").strip()
+
+    # Menyimpan data tanaman baru ke dalam file CSV
+    try:
+        with open('data_tanaman.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([nama_tanaman, harga_per_kg, kebutuhan_bibit, suhu, ketersediaan_air, ph_tanah, ketersediaan_nutrisi, tekstur_tanah])
+        print(center("Tanaman baru berhasil ditambahkan!"))
+    except Exception as e:
+        print(center(f"Terjadi kesalahan: {e}"))
+
+def hapus_tanaman():
+    # Memeriksa apakah pengguna adalah admin
+    if role != "admin":
+        print(center("Hanya admin yang dapat menghapus tanaman."))
+        return
+    
+    try:
+        # Membaca data tanaman dari file CSV
+        data_tanaman = pd.read_csv('data_tanaman.csv')
+    except FileNotFoundError:
+        print(center("File data_tanaman.csv tidak ditemukan."))
+        return
+
+    # Menampilkan daftar tanaman untuk dipilih
+    print(center("===================== Hapus Tanaman ====================="))
+    print(center("Pilih tanaman yang ingin dihapus:"))
+    print(center(tabulate(data_tanaman[['nama_tanaman']], headers='keys', showindex=range(1, len(data_tanaman) + 1), tablefmt='psql')))
+    
+    print(center(f"{len(data_tanaman) + 1}. Kembali"))
+    pilihan_tanaman_user = input(">>> ").strip()
+
+    # Validasi pilihan tanaman
+    if pilihan_tanaman_user.isdigit() and 1 <= int(pilihan_tanaman_user) <= len(data_tanaman):
+        index_tanaman = int(pilihan_tanaman_user) - 1  # Menyesuaikan indeks
+        tanaman_dihapus = data_tanaman.iloc[index_tanaman]['nama_tanaman']
+
+        # Konfirmasi penghapusan
+        konfirmasi = input(f"Apakah Anda yakin ingin menghapus tanaman '{tanaman_dihapus}'? (y/n): ").strip().lower()
+        if konfirmasi == 'y':
+            # Menghapus tanaman dari DataFrame
+            data_tanaman = data_tanaman.drop(index_tanaman).reset_index(drop=True)
+
+            # Menyimpan kembali data ke CSV setelah penghapusan
+            try:
+                data_tanaman.to_csv('data_tanaman.csv', index=False)
+                print(center(f"Tanaman '{tanaman_dihapus}' berhasil dihapus!"))
+            except Exception as e:
+                print(center(f"Terjadi kesalahan saat menyimpan data: {e}"))
+        else:
+            print(center("Penghapusan dibatalkan."))
+
+    elif pilihan_tanaman_user == str(len(data_tanaman) + 1):
+        print(center("Kembali ke menu utama."))
+        return
+    else:
+        print(center("Pilihan tidak valid."))
+
+def tambah_peralatan():
+    # Memeriksa apakah pengguna adalah admin
+    if role != "admin":
+        print(center("Hanya admin yang dapat menambahkan peralatan."))
+        return
+    
+    # Meminta input dari admin untuk menambahkan peralatan baru
+    print(center("===================== Tambah Peralatan ====================="))
+    nama_tanaman = input("Masukkan nama tanaman: ").strip()
+    peralatan = input("Masukkan nama peralatan: ").strip()
+    try:
+        with open('data_peralatan', 'r') as file:
+            reader = csv.reader(file)
+            next(reader)
+            for x in reader:
+                if x[0] == nama_tanaman:
+                    print(center("Tanaman sudah ada"))
+                    return
+    except Exception as e:
+        print(center(f"Terjadi kesalahan {e} silahkan coba kembali"))
+    harga_per_hektar = input("Masukkan harga per hektar: ").strip()
+
+    # Validasi input harga
+    try:
+        harga_per_hektar = int(harga_per_hektar)
+    except ValueError:
+        print(center("Harga harus berupa angka. Silakan coba lagi."))
+        return
+
+    # Menyimpan data peralatan baru ke dalam file CSV
+    try:
+        with open('data_peralatan.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([nama_tanaman, peralatan, harga_per_hektar])
+        print(center("Peralatan baru berhasil ditambahkan!"))
+    except Exception as e:
+        print(center(f"Terjadi kesalahan: {e}"))
+
+def hapus_peralatan():
+    # Memeriksa apakah pengguna adalah admin
+    if role != "admin":
+        print(center("Hanya admin yang dapat menghapus peralatan."))
+        return
+    
+    try:
+        # Membaca data peralatan dari file CSV
+        data_peralatan = pd.read_csv('data_peralatan.csv')
+    except FileNotFoundError:
+        print(center("File data_peralatan.csv tidak ditemukan."))
+        return
+
+    # Menampilkan daftar peralatan untuk dipilih
+    print(center("===================== Hapus Peralatan ====================="))
+    print(center("Pilih peralatan yang ingin dihapus:"))
+    print(center(tabulate(data_peralatan[['nama_tanaman', 'peralatan']], headers='keys', showindex=range(1, len(data_peralatan) + 1), tablefmt='psql')))
+    
+    print(center(f"{len(data_peralatan) + 1}. Kembali"))
+    pilihan_peralatan_user = input(">>> ").strip()
+
+    # Validasi pilihan peralatan
+    if pilihan_peralatan_user.isdigit() and 1 <= int(pilihan_peralatan_user) <= len(data_peralatan):
+        index_peralatan = int(pilihan_peralatan_user) - 1  # Menyesuaikan indeks
+        peralatan_dihapus = data_peralatan.iloc[index_peralatan]
+
+        # Konfirmasi penghapusan
+        konfirmasi = input(f"Apakah Anda yakin ingin menghapus peralatan '{peralatan_dihapus['peralatan']}' untuk tanaman '{peralatan_dihapus['nama_tanaman']}'? (y/n): ").strip().lower()
+        if konfirmasi == 'y':
+            # Menghapus peralatan dari DataFrame
+            data_peralatan = data_peralatan.drop(index_peralatan).reset_index(drop=True)
+
+            # Menyimpan kembali data ke CSV setelah penghapusan
+            try:
+                data_peralatan.to_csv('data_peralatan.csv', index=False)
+                print(center(f"Peralatan '{peralatan_dihapus['peralatan']}' berhasil dihapus!"))
+            except Exception as e:
+                print(center(f"Terjadi kesalahan saat menyimpan data: {e}"))
+        else:
+            print(center("Penghapusan dibatalkan."))
+
+    elif pilihan_peralatan_user == str(len(data_peralatan) + 1):
+        print(center("Kembali ke menu utama."))
+        return
+    else:
+        print(center("Pilihan tidak valid."))
+
 # Menu untuk admin
 def menu_admin():
     while True:
@@ -276,7 +443,11 @@ def menu_admin():
         print(center("1. Lihat Data Pengguna"))
         print(center("2. Lihat Rekap Pemesanan"))
         print(center("3. Hapus Pengguna"))
-        print(center("4. Exit"))
+        print(center("4. Tambah Tanaman"))
+        print(center("5. Hapus Tanaman"))
+        print(center("6. Tambah Peralatan"))
+        print(center("7. Hapus Peralatan"))
+        print(center("8. Exit"))
         inputan = input(">>> ").strip()
         
         cls()
@@ -288,6 +459,14 @@ def menu_admin():
         elif inputan == "3":
             hapus_pengguna()
         elif inputan == "4":
+            tambah_tanaman()
+        elif inputan == "5":
+            hapus_tanaman()
+        elif inputan == "6":
+            tambah_peralatan()
+        elif inputan == "7":
+            hapus_peralatan()
+        elif inputan == "8":
             cls()
             terimakasih()
             break
@@ -335,92 +514,58 @@ def kelola_lahan():
         except ValueError:
             print(center("Input tidak valid. Harap masukkan angka yang benar."))
     
-
 def kelola_tanaman():
     global username
+    try:
+        # Membaca data tanaman dari file CSV
+        data_tanaman = pd.read_csv('data_tanaman.csv')
+    except FileNotFoundError:
+        print(center("File data_tanaman.csv tidak ditemukan."))
+        return
+
     while True:
         print(center("===================== Kelola Tanaman ====================="))
+
+        # Menampilkan daftar tanaman dari file CSV menggunakan tabulate dengan index mulai dari 1
         print(center("Pilih tanaman yang ingin ditanam:"))
-        print(center("1. Padi"))
-        print(center("2. Jagung"))
-        print(center("3. Tembakau"))
-        print(center("4. Kembali"))
+        print(center(tabulate(data_tanaman[['nama_tanaman']], headers='keys', showindex=range(1, len(data_tanaman) + 1), tablefmt='psql')))
+
+        print(center(f"{len(data_tanaman) + 1}. Kembali"))
         pilihan_tanaman_user = input(">>> ")   
-        
+
         cls()
 
-        if pilihan_tanaman_user == "1":
-            harga_per_kg = 75000
-            print(center("Informasi tentang Padi:"))
-            print(center("Cuaca: Memerlukan iklim tropis dan subtropis. Suhu ideal: 24°C - 30°C. Kelembapan tinggi (sekitar 70-90%)."))
-            print(center("Curah Hujan: Padi membutuhkan curah hujan yang cukup, sekitar 1000-2000 mm per tahun."))
-            print(center("Ketersediaan Air: Padi membutuhkan tanah yang selalu tergenang air, terutama pada fase pertumbuhan vegetatif dan pembentukan bulir."))
-            print(center("pH Tanah: Optimal pada pH 5.5 - 7."))
-            print(center("Ketersediaan Nutrisi: Nitrogen (N), fosfor (P), dan kalium (K) dalam jumlah yang cukup diperlukan, terutama untuk pembentukan daun dan bulir."))
-            print(center("Tekstur Tanah: Tanah lempung berpasir atau tanah liat yang mampu menahan air."))
-            print(center("Harga bibit padi: Rp75.000 per kg"))
-            print(center("Kebutuhan bibit: 25 kg per hektar"))
-            while True:
-                jumlah_kg_input = input("Masukkan jumlah kg bibit padi yang ingin dipesan: ")
-                if jumlah_kg_input.isdigit() and int(jumlah_kg_input) > 0:
-                    jumlah_kg = int(jumlah_kg_input)
-                    total_harga = jumlah_kg * harga_per_kg
-                    catat_pemesanan(username, "Padi", jumlah_kg, "Belum Dibayar", total_harga)
-                    print(center("Pemesanan berhasil"))  
-                    
-                    break
-                else:
-                    print(center("Input tidak valid. Silakan masukkan angka.")) 
-        elif pilihan_tanaman_user == "2":
-            harga_per_kg = 60000
-            print(center("Informasi tentang Jagung:"))
-            print(center("Cuaca: Suhu ideal untuk pertumbuhan: 24°C - 30°C. Tidak toleran terhadap cuaca terlalu lembap atau terlalu dingin."))
-            print(center("Curah Hujan: Kebutuhan air sekitar 500-800 mm selama musim tanam, dengan curah hujan merata."))
-            print(center("pH Tanah: Optimal pada pH 5.8 - 7."))
-            print(center("Ketersediaan Nutrisi: Nitrogen sangat penting, diikuti oleh fosfor dan kalium. Pemupukan tambahan mikronutrien seperti seng (Zn) sering diperlukan di beberapa lahan."))
-            print(center("Tekstur Tanah: Tanah lempung berpasir atau lempung yang memiliki drainase baik, tapi mampu menyimpan kelembapan."))
-            print(center("Harga bibit jagung: Rp60.000 per kg"))
-            print(center("Kebutuhan bibit: 20 kg per hektar"))
-            while True:
-                jumlah_kg_input = input("Masukkan jumlah kg bibit jagung yang ingin dipesan: ")
-                if jumlah_kg_input.isdigit() and int(jumlah_kg_input) > 0:
-                    jumlah_kg = int(jumlah_kg_input)
-                    total_harga = jumlah_kg * harga_per_kg
-                    catat_pemesanan(username, "Jagung", jumlah_kg, "Belum Dibayar", total_harga)
-                    print(center("Pemesanan berhasil"))  
-                    
-                    break
-                else:
-                    print(center("Input tidak valid. Silakan masukkan angka.")) 
+        # Validasi pilihan tanaman
+        if pilihan_tanaman_user.isdigit() and 1 <= int(pilihan_tanaman_user) <= len(data_tanaman):
+            index_tanaman = int(pilihan_tanaman_user) - 1  # Mengurangi 1 karena index tabulate mulai dari 1
+            tanaman = data_tanaman.iloc[index_tanaman]
+            
+            # Menampilkan informasi detail tanaman
+            print(center(f"Informasi tentang {tanaman['nama_tanaman']}:"))
+            print(center(f"Suhu: {tanaman['suhu']}"))
+            print(center(f"Kebutuhan Air: {tanaman['ketersediaan_air']}"))
+            print(center(f"pH Tanah: {tanaman['ph_tanah']}"))
+            print(center(f"Kebutuhan Nutrisi: {tanaman['ketersediaan_nutrisi']}"))
+            print(center(f"Tekstur Tanah: {tanaman['tekstur_tanah']}"))
+            print(center(f"Harga bibit: Rp{tanaman['harga_per_kg']:,} per kg"))
+            print(center(f"Kebutuhan bibit: {tanaman['kebutuhan_bibit/hektar']} per hektar"))
 
-        elif pilihan_tanaman_user == "3":
-            harga_per_gram = 1500
-            print(center("Informasi tentang Tembakau:"))
-            print(center("Cuaca: Suhu optimal: 20°C - 30°C. Memerlukan iklim yang hangat dan kering selama periode pertumbuhan, serta cukup sinar matahari."))
-            print(center("Curah Hujan: Kebutuhan air lebih rendah, sekitar 400-600 mm per tahun. Kelembapan tinggi tidak disukai, terutama pada fase pematangan daun."))
-            print(center("pH Tanah: Optimal pada pH 5.5 - 6.5."))
-            print(center("Ketersediaan Nutrisi: Nitrogen, kalium, dan kalsium penting untuk kualitas daun tembakau. Kelebihan nitrogen bisa mengurangi kualitas tembakau, terutama untuk aroma dan cita rasanya."))
-            print(center("Tekstur Tanah: Tanah ringan, seperti tanah berpasir atau lempung berpasir, dengan drain ase yang baik untuk menghindari kelembapan berlebih."))
-            print(center("Harga bibit tembakau: Rp1.500 per gram"))
-            print(center("Biaya persemaian Rp400.000 per hektar, mencakup biaya pupuk, media tanam, dan tenaga kerja untuk proses persemaian."))
-            print(center("Kebutuhan bibit per hektar 75 gram per hektar"))
             while True:
-                jumlah_gram_input = input("Masukkan jumlah gram bibit tembakau yang ingin dipesan: ")
-                if jumlah_gram_input.isdigit() and int(jumlah_gram_input) > 0:
-                    jumlah_gram = int(jumlah_gram_input)
-                    total_harga = jumlah_gram * harga_per_gram
-                    catat_pemesanan(username, "Tembakau", jumlah_gram, "Belum Dibayar", total_harga)
-                    print(center("Pemesanan berhasil"))   
-                    
+                jumlah_kg_input = input(f"Masukkan jumlah kg bibit {tanaman['nama_tanaman']} yang ingin dipesan: ")
+                if jumlah_kg_input.isdigit() and int(jumlah_kg_input) > 0:
+                    jumlah_kg = int(jumlah_kg_input)
+                    total_harga = jumlah_kg * tanaman['harga_per_kg']
+                    catat_pemesanan(username, tanaman['nama_tanaman'], jumlah_kg, "Belum Dibayar", total_harga)
+                    print(center("Pemesanan berhasil"))
                     break
                 else:
                     print(center("Input tidak valid. Silakan masukkan angka."))
 
-        elif pilihan_tanaman_user == "4":
+        elif pilihan_tanaman_user == str(len(data_tanaman) + 1):
             break
-        
+
         else:
-            print(center("Pilihan tidak valid"))
+            print(center("Pilihan tidak valid."))
 
 def kelola_pupuk(): 
     global username
@@ -435,12 +580,11 @@ def kelola_pupuk():
         if pilihan == "1":
             pupuk()
         elif pilihan == "2": 
-            kelola_pestisida()  # Panggil fungsi untuk kelola pestisida
+         pestisida()  # Panggil fungsi untuk kelola pestisida
         elif pilihan == "3":
             break
         else: 
             print(center("Pilihan tidak valid."))
-    
 
 def pupuk():
     pupuk = [ 
@@ -478,7 +622,7 @@ def pupuk():
     cls()
 
 
-def kelola_pestisida(): 
+def pestisida(): 
     pestisida = [ 
         {"nama": "Pestisida Fungisida Dithane M-45", "harga": 90000, "tanaman": "Padi, tembakau", "manfaat": "Mencegah penyakit jamur pada daun"}, 
         {"nama": "Pestisida Insektisida Marshal 200EC", "harga": 110000, "tanaman": "Padi, jagung, tembakau", "manfaat": "Mengendalikan hama ulat dan serangga pada tanaman"}, 
@@ -512,9 +656,15 @@ def kelola_pestisida():
     skip()
     cls()
 
-
 def kelola_peralatan():
     global username
+    try:
+        # Membaca data peralatan dari file CSV
+        data_peralatan = pd.read_csv('data_peralatan.csv')
+    except FileNotFoundError:
+        print(center("File data_peralatan.csv tidak ditemukan."))
+        return
+    
     print(center("===================== Kelola Peralatan ====================="))
     
     while True:
@@ -527,47 +677,26 @@ def kelola_peralatan():
 
         if pilihan_tanaman == "1":
             jenis_tanaman = "Padi"
-            harga_peralatan = {
-                "Traktor untuk Bajak Tanah (Sewa)": 1800000,
-                "Alat Tanam Padi (Transplanter)": 1300000,
-                "Pompa Air": 900000,
-                "Alat Pemupukan dan Penyemprotan (Sprayer)": 450000,
-                "Alat Pemanenan (Padi Harvester)": 2800000
-            }
-            total_biaya = 7250000
-
         elif pilihan_tanaman == "2":
             jenis_tanaman = "Jagung"
-            harga_peralatan = {
-                "Traktor untuk Bajak Tanah (Sewa)": 1500000,
-                "Alat Tanam Jagung (Seeder)": 1100000,
-                "Pompa Air": 800000,
-                "Alat Pemupukan dan Penyemprotan (Sprayer)": 400000,
-                "Alat Pemanenan (Jagung Harvester)": 2500000
-            }
-            total_biaya = 6300000
-
         elif pilihan_tanaman == "3":
             jenis_tanaman = "Tembakau"
-            harga_peralatan = {
-                "Traktor untuk Bajak Tanah (Sewa)": 1700000,
-                "Alat Tanam Tembakau (Tanam Manual atau Seeder Manual)": 900000,
-                "Pompa Air": 1000000,
-                "Alat Pemupukan dan Penyemprotan (Sprayer)": 450000,
-                "Alat Pemanenan (Tembakau Harvester atau Manual)": 2000000
-            }
-            total_biaya = 6050000
-
         elif pilihan_tanaman == "4":
             break
-
         else:
             print(center("Pilihan tidak valid. Silakan coba lagi."))
             continue
 
+        # Menampilkan peralatan dan harga yang sesuai dengan jenis tanaman yang dipilih
+        peralatan_tanaman = data_peralatan[data_peralatan['nama_tanaman'] == jenis_tanaman]
+
+        if peralatan_tanaman.empty:
+            print(center(f"Tidak ada data peralatan untuk tanaman {jenis_tanaman}."))
+            continue
+
         print(center(f"\n===================== Paket Peralatan untuk Tanaman {jenis_tanaman} ====================="))
-        for peralatan, harga in harga_peralatan.items():
-            print(center(f"{peralatan}: Rp{harga:,.0f} per hektar"))
+        # Menampilkan tabel dengan index mulai dari 1
+        print(center(tabulate(peralatan_tanaman[['peralatan', 'harga_per_hektar']], headers='keys', showindex=range(1, len(peralatan_tanaman) + 1), tablefmt='psql')))
 
         try:
             luas_lahan = float(input("\nMasukkan luas lahan yang ingin dikelola (dalam hektar): ").strip())
@@ -575,7 +704,8 @@ def kelola_peralatan():
                 print(center("Luas lahan harus lebih besar dari 0. Silakan coba lagi."))
                 continue
 
-            total_biaya_lahan = total_biaya * luas_lahan
+            # Menghitung total biaya berdasarkan peralatan yang dibutuhkan untuk luas lahan yang dimasukkan
+            total_biaya_lahan = peralatan_tanaman['harga_per_hektar'].sum() * luas_lahan
             print(center(f"\nTotal Biaya untuk {jenis_tanaman} di {luas_lahan} hektar: Rp{total_biaya_lahan:,.0f}"))
 
             # Mencatat pemesanan
@@ -677,7 +807,7 @@ def proses_pembayaran(total_harga, metode):
     konfirmasi = input(center(f"Apakah Anda sudah melakukan pembayaran via {metode}? (y/n): ")).strip().lower() 
     if konfirmasi == "y": 
         print(center("Pembayaran sedang diproses...")) 
-        time.sleep(2)  # Simulasi waktu proses pembayaran 
+        time.sleep(2)  
         return True 
     else: 
         return False 
@@ -719,7 +849,7 @@ def cek_perkembangan_tanaman(debug=False):
                 if isinstance(tipe_pesanan, str):
                     # Cek jika tipe_pesanan mengandung ":"
                     if ':' in tipe_pesanan:
-                        jenis_tanaman = tipe_pesanan.split(":")[1].strip()  # Menentukan jenis tanaman dari tipe pesanan
+                        jenis_tanaman = tipe_pesanan.split(":")[1].strip() 
                     else:
                         # Jika tidak ada ":", kita bisa menggunakan tipe_pesanan sebagai jenis_tanaman
                         jenis_tanaman = tipe_pesanan.strip()
@@ -816,7 +946,6 @@ def pilih_peran():
             print(center("Pilihan tidak tersedia"))
         skip()
 
-# Menu login atau register
 # Menu login atau register
 def fiturlogin():
     global is_logged_in  # gunakan variabel global untuk cek login
